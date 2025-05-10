@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }} - CineMatch{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 text-center">
+                <div class="bg-light p-4 rounded">
+                    <i class="fas fa-film fa-7x text-secondary"></i>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <h1 class="card-title">{{ movie.title }}</h1>
+                <p class="text-muted">{{ movie.genres }}</p>
+                
+                <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-primary me-2"><i class="fas fa-star me-1"></i>{{ movie.vote_average }}</span>
+                    
+                    {% if 'username' in session %}
+                    <form action="{{ url_for('toggle_favorite', movie_id=movie.movie_id) }}" method="post" class="me-2">
+                        <button type="submit" class="btn btn-sm {{ 'btn-danger' if is_favorite else 'btn-outline-danger' }}">
+                            <i class="fas fa-heart me-1"></i>
+                            {{ 'Remove from Favorites' if is_favorite else 'Add to Favorites' }}
+                        </button>
+                    </form>
+                    
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#rateModal">
+                        <i class="fas fa-star me-1"></i>Rate
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <h5>Overview</h5>
+                <p>{{ movie.overview }}</p>
+                
+                {% if user_rating %}
+                <div class="alert alert-info">
+                    <i class="fas fa-star me-1"></i>Your rating: {{ user_rating }}/10
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if 'username' in session %}
+<!-- Rating Modal -->
+<div class="modal fade" id="rateModal" tabindex="-1" aria-labelledby="rateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rateModalLabel">Rate "{{ movie.title }}"</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('rate_movie', movie_id=movie.movie_id) }}" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="rating" class="form-label">Your Rating (1-10)</label>
+                        <input type="number" class="form-control" id="rating" name="rating" min="1" max="10" value="{{ user_rating or 5 }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Rating</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<h3 class="mt-5 mb-4">Similar Movies You Might Like</h3>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+    {% for rec in recommendations %}
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-img-top bg-light text-center py-3">
+                <i class="fas fa-film fa-5x text-secondary"></i>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ rec.title }}</h5>
+                <p class="card-text text-muted">{{ rec.genres }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary"><i class="fas fa-star me-1"></i>{{ rec.vote_average }}</span>
+                    <a href="{{ url_for('movie_detail', movie_id=rec.movie_id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

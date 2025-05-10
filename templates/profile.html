@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - CineMatch{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Profile</h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-user-circle fa-7x text-secondary"></i>
+                </div>
+                <h3>{{ username }}</h3>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">
+                    <i class="fas fa-heart me-1"></i>Favorites
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ratings-tab" data-bs-toggle="tab" data-bs-target="#ratings" type="button" role="tab">
+                    <i class="fas fa-star me-1"></i>Ratings
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content p-3 border border-top-0 rounded-bottom" id="profileTabsContent">
+            <div class="tab-pane fade show active" id="favorites" role="tabpanel">
+                {% if favorite_movies %}
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for movie in favorite_movies %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="card-title">{{ movie.title }}</h5>
+                                    <span class="badge bg-primary"><i class="fas fa-star me-1"></i>{{ movie.vote_average }}</span>
+                                </div>
+                                <p class="card-text text-muted">{{ movie.genres }}</p>
+                                <a href="{{ url_for('movie_detail', movie_id=movie.movie_id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>You haven't added any movies to your favorites yet.
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="tab-pane fade" id="ratings" role="tabpanel">
+                {% if rated_movies %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Movie</th>
+                                <th>Genres</th>
+                                <th>Your Rating</th>
+                                <th>Average Rating</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for movie in rated_movies %}
+                            <tr>
+                                <td>{{ movie.title }}</td>
+                                <td>{{ movie.genres }}</td>
+                                <td>
+                                    <span class="badge bg-success">{{ movie.user_rating }}/10</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ movie.vote_average }}</span>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('movie_detail', movie_id=movie.movie_id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>You haven't rated any movies yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
